@@ -75,12 +75,7 @@ export function DashboardSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              <Link href="/direct-messages/new">
-                <SidebarGroupAction>
-                  <PlusIcon />
-                  <span className="sr-only">New Direct Message</span>
-                </SidebarGroupAction>
-              </Link>
+              <NewDirectMessage />
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarGroup>
