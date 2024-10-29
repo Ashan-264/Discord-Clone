@@ -1,34 +1,18 @@
 {
   "version": 2,
   "name": "chatstarter",
-  "builds": [
-    {
-      "src": "next.config.js",
-      "use": "@vercel/next"
-    },
-    {
-      "src": "convex/_generated/api.ts",
-      "use": "@vercel/node"
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "edge"
     }
-  ],
+  },
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/convex/_generated/api.ts"
-    },
     {
       "src": "/(.*)",
       "dest": "/"
     }
-  ],
-
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "vercel/node"
-    }
-  },
-  "buildCommand": "pnpm build",
-  "installCommand": "pnpm install",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD .",
-  "framework": "nextjs"
+  ]
 }
