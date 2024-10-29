@@ -21,11 +21,7 @@
       "dest": "/"
     }
   ],
-  "env": {
-    "NEXT_PUBLIC_CONVEX_URL": "@convex_url",
-    "NEXT_PUBLIC_CLERK_FRONTEND_API": "@clerk_frontend_api",
-    "CONVEX_ADMIN_KEY": "@convex_admin_key"
-  },
+
   "functions": {
     "api/**/*.ts": {
       "runtime": "vercel/node"
