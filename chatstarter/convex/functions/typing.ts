@@ -36,7 +36,7 @@ export const upsert = authenticatedMutation({
         q.eq("user", ctx.user._id).eq("directMessage", directMessage)
       )
       .unique();
-    const expireAt = Date.now() + 1000 * 5;
+    const expireAt = Math.floor(Date.now() / 1000) + 5;
     if (existing) {
       await ctx.db.patch(existing._id, { expireAt });
       return existing._id;

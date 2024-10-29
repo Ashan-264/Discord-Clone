@@ -26,8 +26,12 @@ export const list = authenticatedQuery({
     return await Promise.all(
       messages.map(async (message) => {
         const sender = await ctx.db.get(message.sender);
+        const attatchment = message.attatchment
+          ? await ctx.storage.getUrl(message.attatchment)
+          : undefined;
         return {
           ...message,
+          attatchment,
           sender,
         };
       })
@@ -38,9 +42,10 @@ export const list = authenticatedQuery({
 export const create = authenticatedMutation({
   args: {
     content: v.string(),
+    attatchment: v.optional(v.id("_storage")),
     directMessage: v.id("directMessages"),
   },
-  handler: async (ctx, { content, directMessage }) => {
+  handler: async (ctx, { content, attatchment, directMessage }) => {
     const member = await ctx.db
       .query("directMessageMembers")
       .withIndex("by_direct_message_user", (q) =>
@@ -52,6 +57,7 @@ export const create = authenticatedMutation({
     }
     await ctx.db.insert("messages", {
       content,
+      attatchment,
       directMessage,
       sender: ctx.user._id,
     });
@@ -75,5 +81,14 @@ export const remove = authenticatedMutation({
       throw new Error("You are not authorized to delete this message");
     }
     await ctx.db.delete(id);
+    if (message.attatchment) {
+      await ctx.storage.delete(message.attatchment);
+    }
+  },
+});
+
+export const generateUploadUrl = authenticatedMutation({
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
   },
 });
