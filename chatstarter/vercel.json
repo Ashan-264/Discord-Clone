@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "name": "chatstarter",
+  "builds": [
+    {
+      "src": "next.config.js",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "convex/_generated/api.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/convex/_generated/api.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_CONVEX_URL": "@convex_url",
+    "NEXT_PUBLIC_CLERK_FRONTEND_API": "@clerk_frontend_api",
+    "CONVEX_ADMIN_KEY": "@convex_admin_key"
+  },
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "vercel/node"
+    }
+  },
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD .",
+  "framework": "nextjs"
+}
