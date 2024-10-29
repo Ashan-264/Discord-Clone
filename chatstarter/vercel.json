@@ -1,13 +1,15 @@
 {
   "version": 2,
-  "name": "chatstarter",
-  "buildCommand": "pnpm build",
-  "installCommand": "pnpm install",
-  "framework": "nextjs",
-  "routes": [
+  "builds": [
     {
-      "src": "/(.*)",
-      "dest": "/"
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
