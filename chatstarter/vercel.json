@@ -6,7 +6,7 @@
   "framework": "nextjs",
   "functions": {
     "api/**/*.ts": {
-      "runtime": "edge"
+      "runtime": "nodejs18.x"
     }
   },
   "routes": [
