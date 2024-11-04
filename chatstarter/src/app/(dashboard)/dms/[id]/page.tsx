@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { useMutation, useQuery } from "convex/react";
-import { use, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { FunctionReturnType } from "convex/server";
 import { toast } from "sonner";
 import { api } from "../../../../../convex/_generated/api";
@@ -36,6 +36,9 @@ export default function MessagePage({
     id,
   });
   const messages = useQuery(api.functions.message.list, { directMessage: id });
+  // Ref for the ScrollAreaViewport
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
   if (!directMessage) {
     return null;
   }
@@ -49,14 +52,19 @@ export default function MessagePage({
         <h1 className="font-semibold">{directMessage.user.username}</h1>
       </header>
       <ScrollArea className="flex-1">
-        <ScrollAreaViewport className="h-full">
+        <ScrollAreaViewport ref={scrollAreaRef} className="h-full">
           {messages?.map((message) => (
             <MessageItem key={message._id} message={message} />
           ))}
         </ScrollAreaViewport>
       </ScrollArea>
       <TypingIndicator directMessage={directMessage._id} />
-      <MessageInput directMessage={directMessage._id} />
+      <div className="sticky bottom-0 bg-white">
+        <MessageInput
+          directMessage={directMessage._id}
+          scrollAreaRef={scrollAreaRef}
+        />
+      </div>
     </div>
   );
 }
@@ -88,15 +96,28 @@ function MessageItem({ message }: { message: Message }) {
         <p className="text-xs text-muted-foreground">
           {message.sender?.username ?? "Deleted User"}
         </p>
-        <p className="text-sm ">{message.content}</p>
-        {message.attatchment && (
-          <Image
-            src={message.attatchment}
-            alt="Attatchment"
-            width={300}
-            height={300}
-            className="rounded border overflow-hidden"
-          />
+        {message.deleted ? (
+          <>
+            <p className="text-sm text-destructive">
+              This message was deleted.
+              {message.deletedReason && (
+                <span> Reason: {message.deletedReason}</span>
+              )}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-sm ">{message.content}</p>
+            {message.attatchment && (
+              <Image
+                src={message.attatchment}
+                alt="Attatchment"
+                width={300}
+                height={300}
+                className="rounded border overflow-hidden"
+              />
+            )}
+          </>
         )}
       </div>
       <MessageActions message={message} />
@@ -128,8 +149,10 @@ function MessageActions({ message }: { message: Message }) {
 }
 function MessageInput({
   directMessage,
+  scrollAreaRef,
 }: {
   directMessage: Id<"directMessages">;
+  scrollAreaRef: React.RefObject<HTMLDivElement>;
 }) {
   const [content, setContent] = useState("");
   const sendMessage = useMutation(api.functions.message.create);
@@ -140,6 +163,7 @@ function MessageInput({
   const generateUploadURL = useMutation(
     api.functions.message.generateUploadUrl
   );
+  const removeAttatchment = useMutation(api.functions.storage.remove);
   const [attatchment, setAttatchment] = useState<Id<"_storage">>();
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -164,6 +188,12 @@ function MessageInput({
       setContent("");
       setAttatchment(undefined);
       setFile(undefined);
+      if (scrollAreaRef.current) {
+        scrollAreaRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+        });
+      }
     } catch (error) {
       toast.error("Failed to send message");
     }
@@ -183,7 +213,25 @@ function MessageInput({
           <span className="sr-only">Attatchment</span>
         </Button>
         <div className="flex flex-col flex-1 gap-2">
-          {file && <ImagePreview file={file} isUploading={isUploading} />}
+          {file && (
+            <ImagePreview
+              file={file}
+              isUploading={isUploading}
+              onDelete={async () => {
+                if (attatchment) {
+                  const url = await removeAttatchment({
+                    storageId: attatchment,
+                  });
+                  console.log(url);
+                }
+                setAttatchment(undefined);
+                setFile(undefined);
+                if (fileInputRef.current) {
+                  fileInputRef.current!.value = "";
+                }
+              }}
+            />
+          )}
           <Input
             placeholder="Message"
             value={content}
@@ -214,15 +262,17 @@ function MessageInput({
 function ImagePreview({
   file,
   isUploading,
+  onDelete,
 }: {
   file: File;
   isUploading: boolean;
+  onDelete: () => void;
 }) {
   return (
-    <div className="relative size-40 overflow-hidden rounded border">
+    <div className="relative size-40 overflow-hidden rounded border group">
       <Image
         src={URL.createObjectURL(file)}
-        alt="Attatchment"
+        alt="Attachment"
         width={300}
         height={300}
       />
@@ -231,6 +281,16 @@ function ImagePreview({
           <LoaderIcon className="animate-spin size-8" />
         </div>
       )}
+      <Button
+        type="button"
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+        variant="destructive"
+        size="icon"
+        onClick={onDelete}
+      >
+        <TrashIcon />
+        <span className="sr-only">Delete</span>
+      </Button>
     </div>
   );
 }
