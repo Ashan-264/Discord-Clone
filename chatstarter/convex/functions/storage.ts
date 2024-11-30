@@ -11,3 +11,9 @@ export const remove = authenticatedMutation({
     return url;
   },
 });
+
+export const generateUploadUrl = authenticatedMutation({
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+  },
+});

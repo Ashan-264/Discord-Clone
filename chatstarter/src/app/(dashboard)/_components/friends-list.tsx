@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { ReactNode, useReducer } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckIcon, MessageCircleIcon, XIcon } from "lucide-react";
 import {
@@ -21,7 +20,9 @@ export function AcceptedFriendsList() {
           Accepted Friends
         </h2>
         {friends?.length === 0 && (
-          <FriendsListEmpty>You don't have any friends yet</FriendsListEmpty>
+          <FriendsListEmpty>
+            You don&apos;t have any friends yet
+          </FriendsListEmpty>
         )}
         {friends?.map((friend, index) => (
           <FriendItem
@@ -102,7 +103,7 @@ export function PendingFriendsList() {
       </h2>
       {friends?.length === 0 && (
         <FriendsListEmpty>
-          You don't have any pending friends request
+          You don&apos;t have any pending friends request
         </FriendsListEmpty>
       )}
       {friends?.map((friend, index) => (

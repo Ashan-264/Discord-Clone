@@ -1,25 +1,21 @@
 import { v } from "convex/values";
-import { authenticatedMutation, authenticatedQuery } from "./helpers";
+import {
+  assertMember,
+  authenticatedMutation,
+  authenticatedQuery,
+} from "./helpers";
 import { internal } from "../_generated/api";
 
 export const list = authenticatedQuery({
   args: {
-    directMessage: v.id("directMessages"),
+    dmOrChannelId: v.union(v.id("directMessages"), v.id("channels")),
   },
-  handler: async (ctx, { directMessage }) => {
-    const member = await ctx.db
-      .query("directMessageMembers")
-      .withIndex("by_direct_message_user", (q) =>
-        q.eq("directMessage", directMessage).eq("user", ctx.user._id)
-      )
-      .first();
-    if (!member) {
-      throw new Error("You are not a member of this DM");
-    }
+  handler: async (ctx, { dmOrChannelId }) => {
+    await assertMember(ctx, dmOrChannelId);
     const messages = await ctx.db
       .query("messages")
-      .withIndex("by_direct_message", (q) =>
-        q.eq("directMessage", directMessage)
+      .withIndex("by_dmOrChannelId", (q) =>
+        q.eq("dmOrChannelId", dmOrChannelId)
       )
       .collect();
     return await Promise.all(
@@ -42,26 +38,18 @@ export const create = authenticatedMutation({
   args: {
     content: v.string(),
     attatchment: v.optional(v.id("_storage")),
-    directMessage: v.id("directMessages"),
+    dmOrChannelId: v.union(v.id("directMessages"), v.id("channels")),
   },
-  handler: async (ctx, { content, attatchment, directMessage }) => {
-    const member = await ctx.db
-      .query("directMessageMembers")
-      .withIndex("by_direct_message_user", (q) =>
-        q.eq("directMessage", directMessage).eq("user", ctx.user._id)
-      )
-      .first();
-    if (!member) {
-      throw new Error("You are not a member of this DM");
-    }
+  handler: async (ctx, { content, attatchment, dmOrChannelId }) => {
+    await assertMember(ctx, dmOrChannelId);
     const messageId = await ctx.db.insert("messages", {
       content,
       attatchment,
-      directMessage,
+      dmOrChannelId,
       sender: ctx.user._id,
     });
     ctx.scheduler.runAfter(0, internal.functions.typing.remove, {
-      directMessage,
+      dmOrChannelId,
       user: ctx.user._id,
     });
     await ctx.scheduler.runAfter(0, internal.functions.moderation.run, {
