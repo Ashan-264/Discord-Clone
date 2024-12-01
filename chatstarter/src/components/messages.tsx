@@ -22,20 +22,23 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { useImageUpload } from "@/hooks/use-image-upload";
 
 export function Messages({ id }: { id: Id<"directMessages"> }) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messages = useQuery(api.functions.message.list, { dmOrChannelId: id });
   return (
-    <>
-      <ScrollArea className="h-full py-4">
+    <div className="flex flex-col h-full">
+      <ScrollArea ref={scrollAreaRef} className="flex-1">
         {messages?.map((message) => (
           <MessageItem key={message._id} message={message} />
         ))}
       </ScrollArea>
-      <TypingIndicator id={id} />
-      <MessageInput id={id} scrollAreaRef={scrollAreaRef} />
-    </>
+      <div className="mt-auto">
+        <TypingIndicator id={id} />
+        <MessageInput id={id} scrollAreaRef={scrollAreaRef} />
+      </div>
+    </div>
   );
 }
 function TypingIndicator({ id }: { id: Id<"directMessages" | "channels"> }) {
@@ -123,43 +126,28 @@ function MessageInput({
   const [content, setContent] = useState("");
   const sendMessage = useMutation(api.functions.message.create);
   const sendTypingIndicator = useMutation(api.functions.typing.upsert);
-  const [file, setFile] = useState<File>();
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const generateUploadURL = useMutation(
-    api.functions.storage.generateUploadUrl
-  );
-  const removeAttatchment = useMutation(api.functions.storage.remove);
-  const [attatchment, setAttatchment] = useState<Id<"_storage">>();
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) {
-      return;
-    }
-    setFile(file);
-    setIsUploading(true);
-    const url = await generateUploadURL();
-    const res = await fetch(url, {
-      method: "POST",
-      body: file,
-    });
-    const { storageId } = (await res.json()) as { storageId: Id<"_storage"> };
-    setAttatchment(storageId);
-    setIsUploading(false);
-  };
+
+  const ImageUpload = useImageUpload();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await sendMessage({ dmOrChannelId: id, attatchment, content });
+      await sendMessage({
+        dmOrChannelId: id,
+        attatchment: ImageUpload.storageId,
+        content,
+      });
       setContent("");
-      setAttatchment(undefined);
-      setFile(undefined);
-      if (scrollAreaRef.current) {
-        scrollAreaRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "end",
-        });
-      }
+      ImageUpload.reset();
+
+      setTimeout(() => {
+        const scrollContainer = scrollAreaRef.current?.querySelector(
+          "[data-radix-scroll-area-viewport]"
+        );
+        if (scrollContainer) {
+          scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        }
+      }, 100);
     } catch (error) {
       toast.error(`Failed to send message: ${error}`);
     }
@@ -172,30 +160,18 @@ function MessageInput({
           type="button"
           size="icon"
           onClick={() => {
-            fileInputRef.current?.click();
+            ImageUpload.open();
           }}
         >
           <PlusIcon />
           <span className="sr-only">Attatchment</span>
         </Button>
         <div className="flex flex-col flex-1 gap-2">
-          {file && (
+          {ImageUpload.previewUrl && (
             <ImagePreview
-              file={file}
-              isUploading={isUploading}
-              onDelete={async () => {
-                if (attatchment) {
-                  const url = await removeAttatchment({
-                    storageId: attatchment,
-                  });
-                  console.log(url);
-                }
-                setAttatchment(undefined);
-                setFile(undefined);
-                if (fileInputRef.current) {
-                  fileInputRef.current!.value = "";
-                }
-              }}
+              url={ImageUpload.previewUrl}
+              isUploading={ImageUpload.isUploading}
+              onDelete={ImageUpload.reset}
             />
           )}
           <Input
@@ -216,33 +192,23 @@ function MessageInput({
         </Button>
       </form>
 
-      <input
-        type="file"
-        className="hidden"
-        ref={fileInputRef}
-        onChange={handleImageUpload}
-      />
+      <input {...ImageUpload.InputProps} />
     </>
   );
 }
 
 function ImagePreview({
-  file,
+  url,
   isUploading,
   onDelete,
 }: {
-  file: File;
+  url: string;
   isUploading: boolean;
   onDelete: () => void;
 }) {
   return (
     <div className="relative size-40 overflow-hidden rounded border group">
-      <Image
-        src={URL.createObjectURL(file)}
-        alt="Attachment"
-        width={300}
-        height={300}
-      />
+      <Image src={url} alt="Attachment" width={300} height={300} />
       {isUploading && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/50">
           <LoaderIcon className="animate-spin size-8" />
