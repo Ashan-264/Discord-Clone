@@ -5,7 +5,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
@@ -22,20 +21,21 @@ import {
 import { SignOutButton } from "@clerk/nextjs";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { useQuery } from "convex/react";
-import { PlusIcon, User2Icon } from "lucide-react";
+import { User2Icon } from "lucide-react";
+//import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { NewDirectMessage } from "./new-direct-message";
-import { userAgent } from "next/server";
+//import { userAgent } from "next/server";
 import { usePathname } from "next/navigation";
 
-export function DashboardSidebar() {
+export function DMSidebar() {
   const pathname = usePathname();
   const directMessages = useQuery(api.functions.dm.list);
   const user = useQuery(api.functions.user.get);
   if (!user) return null;
   return (
-    <Sidebar>
+    <Sidebar className="left-12">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroup>

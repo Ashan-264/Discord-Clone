@@ -1,4 +1,4 @@
-import { DatabaseReader, QueryCtx } from "./../_generated/server.d";
+import { QueryCtx } from "./../_generated/server.d";
 import { v } from "convex/values";
 import { authenticatedMutation, authenticatedQuery } from "./helpers";
 import { Doc, Id } from "../_generated/dataModel";

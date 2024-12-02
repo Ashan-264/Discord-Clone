@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+//import { Button } from "@/components/ui/button";
 import { AddFriend } from "./_components/add-friend";
 import {
   AcceptedFriendsList,

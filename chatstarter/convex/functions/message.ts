@@ -77,8 +77,4 @@ export const remove = authenticatedMutation({
   },
 });
 
-export const generateUploadUrl = authenticatedMutation({
-  handler: async (ctx) => {
-    return await ctx.storage.generateUploadUrl();
-  },
-});
+

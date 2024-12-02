@@ -32,7 +32,7 @@ export default defineSchema({
 
   servers: defineTable({
     name: v.string(),
-    owner: v.id("users"),
+    ownerId: v.id("users"),
     iconId: v.optional(v.id("_storage")),
     defaultChannelId: v.optional(v.id("channels")),
   }),
