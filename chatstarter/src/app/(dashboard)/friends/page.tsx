@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 // Main FriendsPage component
-export const FriendsPage: FC = () => {
+const FriendsPage: FC = () => {
   const acceptedFriends = useQuery(api.functions.friend.listAccepted);
   const pendingFriends = useQuery(api.functions.friend.listPending);
   const updateStatus = useMutation(api.functions.friend.updateStatus);
