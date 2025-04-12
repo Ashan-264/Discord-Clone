@@ -1,0 +1,5 @@
+# .husky/pre-commit
+cd apollo-expense-auditor
+npm run lint
+npm run lint-staged
+#npm test
