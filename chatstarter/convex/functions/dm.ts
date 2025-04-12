@@ -83,7 +83,7 @@ const getDirectMessage = async (
   if (!dm) {
     throw new Error("Direct message does not exist");
   }
-  const otherMembers = await ctx.db.get(id);
+
   const otherMember = await ctx.db
     .query("directMessageMembers")
     .withIndex("by_direct_message", (q) => q.eq("directMessage", id))

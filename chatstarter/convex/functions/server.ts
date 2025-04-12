@@ -1,5 +1,58 @@
 import { v } from "convex/values";
-import { authenticatedMutation } from "./helpers";
+import {
+  assertServerMember,
+  authenticatedMutation,
+  authenticatedQuery,
+} from "./helpers";
+
+export const list = authenticatedQuery({
+  handler: async (ctx) => {
+    const serversMembers = await ctx.db
+      .query("serverMembers")
+      .withIndex("by_userId", (q) => q.eq("userId", ctx.user._id))
+      .collect();
+    const servers = await Promise.all(
+      serversMembers.map(async ({ serverId }) => {
+        const server = await ctx.db.get(serverId);
+        if (!server) return null;
+        return {
+          ...server,
+          iconUrl: server.iconId
+            ? await ctx.storage.getUrl(server.iconId)
+            : null,
+        };
+      })
+    );
+    return servers.filter((server) => server !== null);
+  },
+});
+
+export const get = authenticatedQuery({
+  args: { id: v.id("servers") },
+  handler: async (ctx, { id }) => {
+    await assertServerMember(ctx, id);
+    return await ctx.db.get(id);
+  },
+});
+
+export const members = authenticatedQuery({
+  args: {
+    id: v.id("servers"),
+  },
+  handler: async (ctx, { id }) => {
+    await assertServerMember(ctx, id);
+    const serverMembers = await ctx.db
+      .query("serverMembers")
+      .withIndex("by_serverId", (q) => q.eq("serverId", id))
+      .collect();
+    const users = await Promise.all(
+      serverMembers.map(async ({ userId }) => {
+        return await ctx.db.get(userId);
+      })
+    );
+    return users.filter((user) => user !== null);
+  },
+});
 
 export const create = authenticatedMutation({
   args: {

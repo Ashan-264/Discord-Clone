@@ -24,7 +24,11 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useImageUpload } from "@/hooks/use-image-upload";
 
-export function Messages({ id }: { id: Id<"directMessages"> }) {
+export function Messages({
+  id,
+}: {
+  id: Id<"directMessages"> | Id<"channels">;
+}) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messages = useQuery(api.functions.message.list, { dmOrChannelId: id });
   return (
