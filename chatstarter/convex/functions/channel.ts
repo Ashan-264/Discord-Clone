@@ -6,6 +6,18 @@ import {
   authenticatedQuery,
 } from "./helpers";
 
+export const get = authenticatedQuery({
+  args: { id: v.id("channels") },
+  handler: async (ctx, { id }) => {
+    const channel = await ctx.db.get(id);
+    if (!channel) {
+      throw new Error("Channel not found");
+    }
+    await assertServerMember(ctx, channel.serverId);
+    return channel;
+  },
+});
+
 export const list = authenticatedQuery({
   args: { id: v.id("servers") },
   handler: async (ctx, { id }) => {
@@ -37,6 +49,27 @@ export const create = authenticatedMutation({
       throw new Error("Channel already exists");
     }
 
-    await ctx.db.insert("channels", { serverId, name });
+    const channelId = await ctx.db.insert("channels", { serverId, name });
+    return channelId;
+  },
+});
+
+export const remove = authenticatedMutation({
+  args: { id: v.id("channels") },
+  handler: async (ctx, { id }) => {
+    const channel = await ctx.db.get(id);
+    if (!channel) {
+      throw new Error("Channel not found");
+    }
+    await assertServerOwner(ctx, channel.serverId);
+    const server = await ctx.db.get(channel.serverId);
+    if (!server) {
+      throw new Error("Server not found");
+    } else if (server.ownerId !== ctx.user._id) {
+      throw new Error("You are not the owner of this server");
+    } else if (channel._id === server.defaultChannelId) {
+      throw new Error("You cannot delete the default channel");
+    }
+    await ctx.db.delete(id);
   },
 });
