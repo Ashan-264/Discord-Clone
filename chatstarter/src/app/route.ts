@@ -1,7 +1,8 @@
+// src/app/route.ts
 import { NextResponse } from "next/server";
 
 export function GET(request: Request) {
-  // `request.url` is the full incoming URL (including origin) in prod
-  const destination = new URL("/dms", request.url);
-  return NextResponse.redirect(destination);
+  const url = new URL(request.url);
+  url.pathname = "/dms";
+  return NextResponse.redirect(url);
 }
