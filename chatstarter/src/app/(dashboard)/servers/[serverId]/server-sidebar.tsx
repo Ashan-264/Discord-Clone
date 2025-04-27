@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuAction,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 
@@ -20,6 +21,7 @@ import { Id } from "../../../../../convex/_generated/dataModel";
 import CreateChannel from "./create-channel"; // Adjust the path if `create-channel` is in a different location
 import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
+import { Voice } from "../voice";
 
 export function ServerSidebar({ id }: { id: Id<"servers"> }) {
   const pathname = usePathname();
@@ -78,6 +80,26 @@ export function ServerSidebar({ id }: { id: Id<"servers"> }) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                {" "}
+                <Voice serverId={id} />{" "}
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  className="group-data-[collapsible=icon]:!p-0"
+                >
+                  <Link href={`/servers/${id}/members`}>Members</Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
     </Sidebar>
   );
 }
