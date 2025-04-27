@@ -1,10 +1,7 @@
-// src/app/(dashboard)/route.ts
 import { NextResponse } from "next/server";
 
-export function GET() {
-  return NextResponse.redirect("/dms");
+export function GET(request: Request) {
+  // `request.url` is the full incoming URL (including origin) in prod
+  const destination = new URL("/dms", request.url);
+  return NextResponse.redirect(destination);
 }
-// export function GET(req: Request) {
-//   const url = new URL("/dms", req.url);
-//   return Response.redirect(url);
-// }
