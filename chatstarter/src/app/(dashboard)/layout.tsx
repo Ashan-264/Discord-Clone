@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { RedirectToSignIn } from "@clerk/nextjs";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { MainSidebar } from "./main-sidebar";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function DashboardLayout({
   children,
@@ -15,7 +16,7 @@ export default function DashboardLayout({
       <Authenticated>
         <SidebarProvider defaultOpen={false}>
           <MainSidebar />
-          {children}{" "}
+          {children} <Analytics />
         </SidebarProvider>{" "}
       </Authenticated>
       <Unauthenticated>
