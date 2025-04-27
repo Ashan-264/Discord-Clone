@@ -8,8 +8,7 @@
     "dev:next": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "prepare": "cd .. && husky  ./apollo-expense-auditor/.husky"
+    "lint": "next lint"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.0.2",
