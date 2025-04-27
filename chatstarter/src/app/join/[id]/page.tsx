@@ -16,15 +16,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Id } from "../../../../convex/_generated/dataModel";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { SignInButton } from "@clerk/nextjs";
 
-export default function JoinPage({
-  params,
-}: {
-  params: { id: Id<"invites"> };
-}) {
-  const { id } = params;
+export default function JoinPage() {
+  const params = useParams();
+  const id = params.id as Id<"invites">;
+
   const invite = useQuery(api.functions.invite.get, { id });
   const join = useMutation(api.functions.invite.join);
   const router = useRouter();
