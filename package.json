@@ -1,8 +1,0 @@
-{
-	"dependencies": {
-		"@radix-ui/react-scroll-area": "^1.2.0"
-	},
-	"devDependencies": {
-		"shadcn-ui": "^0.9.3"
-	}
-}
