@@ -10,8 +10,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export function AcceptedFriendsList() {
+  const createDirectMessage = useMutation(api.functions.dm.create); // your DM‐creation mutation
+  const router = useRouter();
   const friends = useQuery(api.functions.friend.listAccepted);
   const updateStatus = useMutation(api.functions.friend.updateStatus);
   return (
@@ -37,7 +40,12 @@ export function AcceptedFriendsList() {
                   title="DM"
                   icon={<MessageCircleIcon />}
                   className=""
-                  onClick={() => {}}
+                  onClick={async () => {
+                    const dmId = await createDirectMessage({
+                      username: friend.user.username,
+                    });
+                    router.push(`/dms/${dmId}`);
+                  }}
                 />
               </TooltipTrigger>
               <TooltipContent>Start DM</TooltipContent>
