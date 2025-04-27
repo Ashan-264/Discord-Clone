@@ -2,6 +2,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
+import { CreateInvite } from "./create-invite";
 
 export function ServerMembers({ id }: { id: Id<"servers"> }) {
   const members = useQuery(api.functions.server.members, { id });
@@ -17,6 +18,7 @@ export function ServerMembers({ id }: { id: Id<"servers"> }) {
           </Avatar>
         </div>
       ))}
+      <CreateInvite serverId={id} />
     </div>
   );
 }
