@@ -1,6 +1,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
@@ -14,6 +15,7 @@ import { CreateServer } from "./dms/create-server";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function MainSidebar() {
   const servers = useQuery(api.functions.server.list);
@@ -70,6 +72,9 @@ export function MainSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="px-4 py-3">
+        <ThemeToggle />
+      </SidebarFooter>
     </Sidebar>
   );
 }

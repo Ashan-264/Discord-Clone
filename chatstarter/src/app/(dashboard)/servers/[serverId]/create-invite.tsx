@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
   SelectItem,
+  SelectContent,
 } from "@/components/ui/select";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,6 @@ import { toast } from "sonner";
 import { useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { useState } from "react";
-import { SelectContent } from "@radix-ui/react-select";
 
 export function CreateInvite({ serverId }: { serverId: Id<"servers"> }) {
   const [inviteId, setInviteId] = useState<Id<"invites"> | null>(null);
@@ -108,20 +108,36 @@ function CreateInviteForm({
       </DialogHeader>
 
       <form className="contents" onSubmit={handleSubmit}>
-        {/* Expires At */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="expiresAt">Expires At</Label>
           <Select value={expiresAt} onValueChange={setExpiresAt}>
             <SelectTrigger
               id="expiresAt"
-              className="w-full"
+              className="
+                w-full px-3 py-2
+                border border-gray-300 rounded-md
+                text-left flex items-center justify-between
+                hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500
+              "
               aria-label="Expires At"
             >
               <SelectValue placeholder="Select expiration time" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              className="
+                mt-1 w-full bg-white dark:bg-surface  rounded-md shadow-lg
+                max-h-60 overflow-auto py-1 z-50
+              "
+            >
               {EXPIRES_AT_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value.toString()}>
+                <SelectItem
+                  key={option.value}
+                  value={option.value.toString()}
+                  className="
+                    px-3 py-2 rounded-md cursor-pointer
+                    hover:bg-gray-100 focus:bg-gray-100
+                  "
+                >
                   {option.label}
                 </SelectItem>
               ))}
@@ -129,20 +145,36 @@ function CreateInviteForm({
           </Select>
         </div>
 
-        {/* Max Uses */}
         <div className="flex flex-col gap-2 mt-4">
           <Label htmlFor="maxUses">Max Uses</Label>
           <Select value={maxUses} onValueChange={setMaxUses}>
             <SelectTrigger
               id="maxUses"
-              className="w-full"
+              className="
+                w-full px-3 py-2
+                border border-gray-300 rounded-md
+                 text-left flex items-center justify-between
+                hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500
+              "
               aria-label="Max Uses"
             >
               <SelectValue placeholder="Select max uses" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              className="
+                mt-1 w-full bg-white dark:bg-surface rounded-md shadow-lg
+                max-h-60 overflow-auto py-1 z-50
+              "
+            >
               {MAX_USES.map((option) => (
-                <SelectItem key={option.value} value={option.value.toString()}>
+                <SelectItem
+                  key={option.value}
+                  value={option.value.toString()}
+                  className="
+                    px-3 py-2 rounded-md cursor-pointer
+                    hover:bg-gray-100 focus:bg-gray-100
+                  "
+                >
                   {option.label}
                 </SelectItem>
               ))}
@@ -150,7 +182,6 @@ function CreateInviteForm({
           </Select>
         </div>
 
-        {/* Submit Button */}
         <DialogFooter className="flex justify-end space-x-2 mt-6">
           <Button type="submit">Create Invite</Button>
         </DialogFooter>
@@ -169,17 +200,17 @@ function CreatedInvite({
   const url = new URL(`/join/${inviteId}`, window.location.href).toString();
   return (
     <DialogContent>
-      <DialogHeader>
+      <DialogHeader className="mb-6">
         <DialogTitle>Create Invite</DialogTitle>
         <DialogDescription>
           Create a new invite link for this server.
         </DialogDescription>
       </DialogHeader>
-      <div className="flex flex-gap-2">
+      <div className="flex flex-gap-2 mb-6">
         <Label htmlFor="url">Invite URL</Label>
         <Input id="url" type="text" value={url} readOnly />
       </div>
-      <DialogFooter>
+      <DialogFooter className="flex justify-end space-x-2">
         <Button
           onClick={() => {
             navigator.clipboard.writeText(url);
@@ -188,10 +219,11 @@ function CreatedInvite({
         >
           Copy
         </Button>
+
+        <Button variant="secondary" onClick={onClose}>
+          Back
+        </Button>
       </DialogFooter>
-      <Button variant="secondary" onClick={onClose}>
-        Back
-      </Button>
     </DialogContent>
   );
 }

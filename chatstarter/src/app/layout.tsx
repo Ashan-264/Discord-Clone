@@ -3,6 +3,7 @@ import "./globals.css";
 import { ConvexClientProvider } from "./convex-client-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "Hybrid Chatter",
@@ -18,14 +19,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="emerald-blue-light" suppressHydrationWarning>
       <body>
-        <ClerkProvider dynamic>
-          <ConvexClientProvider>
-            {children}
-            <Toaster />
-          </ConvexClientProvider>
-        </ClerkProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark">
+          <ClerkProvider dynamic>
+            <ConvexClientProvider>
+              {children}
+              <Toaster />
+            </ConvexClientProvider>
+          </ClerkProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -66,10 +66,10 @@ export function DMSidebar() {
                           <AvatarImage src={directMessage.user.image} />
                           <AvatarFallback>
                             {" "}
-                            {directMessage.user.username[0]}
+                            {directMessage.user.username}
                           </AvatarFallback>
                         </Avatar>
-                        <p>{directMessage.user.username[0]}</p>
+                        <p>{directMessage.user.username}</p>
                       </div>
                     </Link>
                   </SidebarMenuButton>
