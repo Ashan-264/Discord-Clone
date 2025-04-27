@@ -13,13 +13,11 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as functions_agora from "../functions/agora.js";
 import type * as functions_channel from "../functions/channel.js";
 import type * as functions_dm from "../functions/dm.js";
 import type * as functions_friend from "../functions/friend.js";
 import type * as functions_helpers from "../functions/helpers.js";
 import type * as functions_invite from "../functions/invite.js";
-import type * as functions_livekit from "../functions/livekit.js";
 import type * as functions_message from "../functions/message.js";
 import type * as functions_moderation from "../functions/moderation.js";
 import type * as functions_server from "../functions/server.js";
@@ -39,13 +37,11 @@ import type * as http from "../http.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  "functions/agora": typeof functions_agora;
   "functions/channel": typeof functions_channel;
   "functions/dm": typeof functions_dm;
   "functions/friend": typeof functions_friend;
   "functions/helpers": typeof functions_helpers;
   "functions/invite": typeof functions_invite;
-  "functions/livekit": typeof functions_livekit;
   "functions/message": typeof functions_message;
   "functions/moderation": typeof functions_moderation;
   "functions/server": typeof functions_server;
