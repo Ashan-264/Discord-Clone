@@ -22,7 +22,7 @@ export const run = internalAction({
     );
     if (!message) return;
     const result = await groq.chat.completions.create({
-      model: "llama-guard-3-8b",
+      model: "meta-llama/Llama-Guard-4-12B",
       messages: [
         {
           role: "user",
