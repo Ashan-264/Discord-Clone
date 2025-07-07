@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { UserIcon } from "lucide-react";
+import { UserIcon, Shield } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CreateServer } from "./dms/create-server";
@@ -19,6 +19,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function MainSidebar() {
   const servers = useQuery(api.functions.server.list);
+  const isAdminUser = useQuery(api.functions.user.isAdmin);
   const pathname = usePathname();
   return (
     <Sidebar collapsible="icon">
@@ -37,6 +38,19 @@ export function MainSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {isAdminUser && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    tooltip="Admin Dashboard"
+                    isActive={pathname.startsWith("/admin")}
+                    asChild
+                  >
+                    <Link href="/admin">
+                      <Shield className="text-red-500" />
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
               <SidebarMenuItem>
                 <CreateServer />
               </SidebarMenuItem>

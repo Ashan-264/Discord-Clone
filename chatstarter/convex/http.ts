@@ -1,4 +1,3 @@
-import { upsert } from "./functions/user";
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { Webhook } from "svix";
@@ -21,6 +20,7 @@ http.route({
           username: body.data.username!,
           image: body.data.image_url,
           clerkId: body.data.id!,
+          email: body.data.email_addresses?.[0]?.email_address,
         });
         break;
       case "user.updated":
@@ -28,6 +28,7 @@ http.route({
           username: body.data.username!,
           image: body.data.image_url,
           clerkId: body.data.id!,
+          email: body.data.email_addresses?.[0]?.email_address,
         });
         break;
       case "user.deleted":
@@ -56,7 +57,7 @@ const validateRequest = async (req: Request) => {
       "svix-timestamp": svix_timestamp!,
       "svix-signature": svix_signature!,
     }) as unknown as WebhookEvent;
-  } catch (error) {
+  } catch {
     return null;
   }
 };

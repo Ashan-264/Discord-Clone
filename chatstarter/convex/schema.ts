@@ -6,9 +6,14 @@ export default defineSchema({
     username: v.string(),
     image: v.string(),
     clerkId: v.string(),
+    email: v.optional(v.string()),
+    role: v.optional(v.union(v.literal("user"), v.literal("admin"))),
+    isPrivate: v.optional(v.boolean()),
   })
     .index("by_clerk_id", ["clerkId"])
-    .index("by_username", ["username"]),
+    .index("by_username", ["username"])
+    .index("by_email", ["email"])
+    .index("by_privacy", ["isPrivate"]),
 
   friends: defineTable({
     user1: v.id("users"),

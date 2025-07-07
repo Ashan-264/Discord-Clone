@@ -19,7 +19,7 @@ import Link from "next/link";
 
 import { Id } from "../../../../../convex/_generated/dataModel";
 import CreateChannel from "./create-channel"; // Adjust the path if `create-channel` is in a different location
-import { TrashIcon } from "lucide-react";
+import { TrashIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Voice } from "../voice";
 
@@ -90,10 +90,14 @@ export function ServerSidebar({ id }: { id: Id<"servers"> }) {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
+                  isActive={pathname === `/servers/${id}/members`}
                   asChild
                   className="group-data-[collapsible=icon]:!p-0"
                 >
-                  <Link href={`/servers/${id}/members`}>Members</Link>
+                  <Link href={`/servers/${id}/members`}>
+                    <Users className="h-4 w-4" />
+                    Members
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
