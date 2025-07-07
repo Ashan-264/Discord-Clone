@@ -42,7 +42,6 @@ export const assertServerOwner = async (
     throw new Error("Server not found");
   }
   if (server.ownerId !== ctx.user._id) {
-  } else if (server.ownerId !== ctx.user._id) {
     throw new Error("You are not the owner of this server");
   }
 };

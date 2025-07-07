@@ -20,7 +20,7 @@ export function AcceptedFriendsList() {
   return (
     <>
       <div className="flex flex-col divide-y">
-        <h2 className="text-xs font-medium text-muted-forground p-2.5">
+        <h2 className="text-xs font-medium text-muted-foreground p-2.5">
           Accepted Friends
         </h2>
         {friends?.length === 0 && (
@@ -67,7 +67,7 @@ export function AcceptedFriendsList() {
 
 function FriendsListEmpty({ children }: { children: React.ReactNode }) {
   return (
-    <div className="p-4 bg-muted/50 text-center text-sm text-muted-forground">
+    <div className="p-4 bg-muted/50 text-center text-sm text-muted-foreground">
       {children}
     </div>
   );
@@ -107,7 +107,7 @@ export function PendingFriendsList() {
   const updateStatus = useMutation(api.functions.friend.updateStatus);
   return (
     <div className="flex flex-col divide-y">
-      <h2 className="text-xs font-medium text-muted-forground p-2.5">
+      <h2 className="text-xs font-medium text-muted-foreground p-2.5">
         Pending Friends
       </h2>
       {friends?.length === 0 && (

@@ -21,6 +21,7 @@ export function MainSidebar() {
   const servers = useQuery(api.functions.server.list);
   const isAdminUser = useQuery(api.functions.user.isAdmin);
   const pathname = usePathname();
+
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>

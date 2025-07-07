@@ -51,7 +51,7 @@ function TypingIndicator({ id }: { id: Id<"directMessages" | "channels"> }) {
     return null;
   }
   return (
-    <div className="text-sm text-muted-forground px-4 py-2">
+    <div className="text-sm text-muted-foreground px-4 py-2">
       {username.join(",")} is typing...
     </div>
   );
@@ -183,7 +183,6 @@ function MessageInput({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={() => {
-              //there was a e in {(e) =>}
               if (content.length > 0) {
                 sendTypingIndicator({ dmOrChannelId: id });
               }

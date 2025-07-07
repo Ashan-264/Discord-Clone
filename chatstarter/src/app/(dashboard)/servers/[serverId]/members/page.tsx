@@ -6,16 +6,18 @@ import { Id } from "../../../../../../convex/_generated/dataModel";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Badge } from "../../../../../components/ui/badge";
 import { Shield, User } from "lucide-react";
+import { use } from "react";
 
 export default function MembersPage({
   params,
 }: {
-  params: { serverId: Id<"servers"> };
+  params: Promise<{ serverId: Id<"servers"> }>;
 }) {
+  const { serverId } = use(params);
   const members = useQuery(api.functions.server.members, {
-    id: params.serverId,
+    id: serverId,
   });
-  const server = useQuery(api.functions.server.get, { id: params.serverId });
+  const server = useQuery(api.functions.server.get, { id: serverId });
 
   if (!server) {
     return (
