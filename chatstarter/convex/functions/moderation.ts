@@ -22,8 +22,13 @@ export const run = internalAction({
     );
     if (!message) return;
     const result = await groq.chat.completions.create({
-      model: "meta-llama/Llama-Guard-4-12B",
+      model: "openai/gpt-oss-20b",
       messages: [
+        {
+          role: "system",
+          content:
+            'Classify the user message for safety. Reply with exactly "safe", or "unsafe" followed by a newline and only the code (e.g. S1) of the violated category: S1 Violent Crimes, S2 Non-Violent Crimes, S3 Sex-Related Crimes, S4 Child Sexual Exploitation, S5 Defamation, S6 Specialized Advice, S7 Privacy, S8 Intellectual Property, S9 Indiscriminate Weapons, S10 Hate, S11 Suicide & Self-Harm, S12 Sexual Content, S13 Elections, S14 Code Interpreter Abuse.',
+        },
         {
           role: "user",
           content: message.content,

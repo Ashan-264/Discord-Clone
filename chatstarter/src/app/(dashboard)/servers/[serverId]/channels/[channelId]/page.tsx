@@ -8,9 +8,9 @@ import { api } from "../../../../../../../convex/_generated/api";
 export default function ChannelPage({
   params,
 }: {
-  params: Promise<{ channelId: Id<"channels"> }>;
+  params: Promise<{ channelId: string }>;
 }) {
-  const { channelId } = use(params);
+  const channelId = use(params).channelId as Id<"channels">;
   const channel = useQuery(api.functions.channel.get, { id: channelId });
   return (
     <div className="flex flex-1 flex-col divide-y">

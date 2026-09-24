@@ -11,9 +11,9 @@ import { use } from "react";
 export default function MembersPage({
   params,
 }: {
-  params: Promise<{ serverId: Id<"servers"> }>;
+  params: Promise<{ serverId: string }>;
 }) {
-  const { serverId } = use(params);
+  const serverId = use(params).serverId as Id<"servers">;
   const members = useQuery(api.functions.server.members, {
     id: serverId,
   });

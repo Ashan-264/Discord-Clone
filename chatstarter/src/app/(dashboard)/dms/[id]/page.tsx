@@ -10,9 +10,9 @@ import { api } from "../../../../../convex/_generated/api";
 export default function MessagePage({
   params,
 }: {
-  params: Promise<{ id: Id<"directMessages"> }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
+  const id = use(params).id as Id<"directMessages">;
   const directMessage = useQuery(api.functions.dm.get, {
     id,
   });

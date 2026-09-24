@@ -13,9 +13,9 @@ export default function ServerLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ serverId: Id<"servers"> }>;
+  params: Promise<{ serverId: string }>;
 }) {
-  const { serverId } = use(params);
+  const serverId = use(params).serverId as Id<"servers">;
   const pathname = usePathname();
 
   // Don't show ServerMembers component when on the members page
