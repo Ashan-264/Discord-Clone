@@ -7,6 +7,9 @@ import {
 } from "./helpers";
 import { internalMutation } from "../_generated/server";
 
+// How long a typing indicator stays alive after the last keystroke.
+const TYPING_TIMEOUT_MS = 5000;
+
 export const list = authenticatedQuery({
   args: {
     dmOrChannelId: v.union(v.id("directMessages"), v.id("channels")),
@@ -19,6 +22,7 @@ export const list = authenticatedQuery({
         q.eq("dmOrChannelId", dmOrChannelId)
       )
       .filter((q) => q.neq(q.field("user"), ctx.user._id))
+      .filter((q) => q.gt(q.field("expireAt"), Date.now()))
       .collect();
     return await Promise.all(
       typingIndicators.map(async (indicator) => {
@@ -43,23 +47,32 @@ export const upsert = authenticatedMutation({
         q.eq("user", ctx.user._id).eq("dmOrChannelId", dmOrChannelId)
       )
       .unique();
-    const expireAt = Math.floor(Date.now() / 1000) + 5;
+    // Milliseconds since the epoch, to match Date.now() everywhere else.
+    const expireAt = Date.now() + TYPING_TIMEOUT_MS;
+
+    // Schedule a cleanup for *every* upsert, not just the first one. `remove`
+    // only deletes when the stored expireAt still matches the one it was
+    // scheduled with, so superseded cleanups are no-ops and the newest keystroke
+    // always owns the deletion.
+    await ctx.scheduler.runAfter(
+      TYPING_TIMEOUT_MS,
+      internal.functions.typing.remove,
+      {
+        dmOrChannelId,
+        user: ctx.user._id,
+        expireAt,
+      }
+    );
+
     if (existing) {
       await ctx.db.patch(existing._id, { expireAt });
       return existing._id;
-    } else {
-      const newIndicatorId = await ctx.db.insert("typingIndicators", {
-        user: ctx.user._id,
-        dmOrChannelId,
-        expireAt,
-      });
-      await ctx.scheduler.runAfter(expireAt, internal.functions.typing.remove, {
-        dmOrChannelId,
-        user: ctx.user._id,
-        expireAt,
-      });
-      return newIndicatorId;
     }
+    return await ctx.db.insert("typingIndicators", {
+      user: ctx.user._id,
+      dmOrChannelId,
+      expireAt,
+    });
   },
 });
 export const remove = internalMutation({

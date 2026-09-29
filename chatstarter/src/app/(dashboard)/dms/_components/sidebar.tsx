@@ -41,7 +41,7 @@ export function DMSidebar() {
           <SidebarGroup>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === "/"}>
+                <SidebarMenuButton asChild isActive={pathname === "/friends"}>
                   <Link href="/friends">
                     <User2Icon />
                     Friends
@@ -58,7 +58,7 @@ export function DMSidebar() {
                 <SidebarMenuItem key={directMessage._id}>
                   <SidebarMenuButton
                     asChild
-                    isActive={pathname === `/dm/${directMessage._id}`}
+                    isActive={pathname === `/dms/${directMessage._id}`}
                   >
                     <Link href={`/dms/${directMessage._id}`}>
                       <div className="flex items-center">
@@ -75,7 +75,6 @@ export function DMSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              <NewDirectMessage />
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarGroup>

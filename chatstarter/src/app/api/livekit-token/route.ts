@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AccessToken } from "livekit-server-sdk";
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET(req: NextRequest) {
   try {
@@ -7,6 +8,11 @@ export async function GET(req: NextRequest) {
     const serverId = searchParams.get("serverId");
     if (!serverId) {
       return NextResponse.json({ error: "Missing serverId" }, { status: 400 });
+    }
+
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const apiKey = process.env.LIVEKIT_API_KEY;
@@ -18,9 +24,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Build a short-lived token (1h)
+    // Identity must be unique per participant: LiveKit disconnects an existing
+    // participant when a new one joins with the same identity, so keying this on
+    // serverId let each joiner kick the previous occupant out of the room.
     const at = new AccessToken(apiKey, apiSecret, {
-      identity: serverId,
+      identity: userId,
     });
     at.addGrant({ room: serverId, roomJoin: true });
     const token = await at.toJwt();

@@ -1,4 +1,4 @@
-import { QueryCtx } from "./../_generated/server.d";
+import { QueryCtx } from "../_generated/server";
 import { v } from "convex/values";
 import { authenticatedMutation, authenticatedQuery } from "./helpers";
 import { Doc, Id } from "../_generated/dataModel";
@@ -9,9 +9,15 @@ export const list = authenticatedQuery({
       .query("directMessageMembers")
       .withIndex("by_user", (q) => q.eq("user", ctx.user._id))
       .collect();
-    return await Promise.all(
+    // A single unresolvable conversation (deleted account, missing member) must
+    // not take down the whole sidebar, so drop the broken ones instead of
+    // letting the rejection propagate.
+    const results = await Promise.allSettled(
       directMessages.map((dm) => getDirectMessage(ctx, dm.directMessage))
     );
+    return results
+      .filter((r) => r.status === "fulfilled")
+      .map((r) => r.value);
   },
 });
 export const get = authenticatedQuery({

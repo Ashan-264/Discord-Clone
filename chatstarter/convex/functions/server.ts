@@ -4,6 +4,7 @@ import {
   assertServerOwner,
   authenticatedMutation,
   authenticatedQuery,
+  deleteChannelCascade,
 } from "./helpers";
 
 export const list = authenticatedQuery({
@@ -105,36 +106,9 @@ export const remove = authenticatedMutation({
       .filter((q) => q.eq(q.field("serverId"), id))
       .collect();
 
-    // Delete all messages in channels
+    // Delete each channel along with its messages, attachments and typing indicators
     for (const channel of channels) {
-      const messages = await ctx.db
-        .query("messages")
-        .withIndex("by_dmOrChannelId", (q) =>
-          q.eq("dmOrChannelId", channel._id)
-        )
-        .collect();
-
-      for (const message of messages) {
-        if (message.attatchment) {
-          await ctx.storage.delete(message.attatchment);
-        }
-        await ctx.db.delete(message._id);
-      }
-
-      // Delete typing indicators for this channel
-      const typingIndicators = await ctx.db
-        .query("typingIndicators")
-        .withIndex("by_dmOrChannelId", (q) =>
-          q.eq("dmOrChannelId", channel._id)
-        )
-        .collect();
-
-      for (const indicator of typingIndicators) {
-        await ctx.db.delete(indicator._id);
-      }
-
-      // Delete the channel
-      await ctx.db.delete(channel._id);
+      await deleteChannelCascade(ctx, channel._id);
     }
 
     // Delete all server members

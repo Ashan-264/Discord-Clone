@@ -30,8 +30,7 @@ export const run = internalAction({
         },
       ],
     });
-    const value = result.choices[0].message.content;
-    console.log(value);
+    const value = result.choices[0]?.message?.content;
 
     if (value?.startsWith("unsafe")) {
       await ctx.runMutation(internal.functions.moderation.deleteMessage, {
@@ -42,7 +41,7 @@ export const run = internalAction({
   },
 });
 
-const reasons = {
+const reasons: Record<string, string> = {
   S1: "Violent Crimes",
   S2: "Non-Violent Crimes",
   S3: "Sex-Related Crimes",
@@ -59,6 +58,18 @@ const reasons = {
   S14: "Code Interpreter Abuse",
 };
 
+// Llama Guard reports one or more category codes, e.g. "S2" or "S1,S10".
+// Look each one up individually so a multi-category verdict doesn't fall through
+// to an unmatched key and lose the reason entirely.
+const describeReason = (reason: string | undefined) => {
+  if (!reason) return undefined;
+  const described = reason
+    .split(/[,\s]+/)
+    .map((code) => reasons[code.trim()])
+    .filter((label): label is string => Boolean(label));
+  return described.length > 0 ? described.join(", ") : undefined;
+};
+
 export const deleteMessage = internalMutation({
   args: {
     id: v.id("messages"),
@@ -67,25 +78,7 @@ export const deleteMessage = internalMutation({
   handler: async (ctx, { id, reason }) => {
     return await ctx.db.patch(id, {
       deleted: true,
-      deletedReason: reason
-        ? reasons[
-            reason as
-              | "S1"
-              | "S2"
-              | "S3"
-              | "S4"
-              | "S5"
-              | "S6"
-              | "S7"
-              | "S8"
-              | "S9"
-              | "S10"
-              | "S11"
-              | "S12"
-              | "S13"
-              | "S14"
-          ]
-        : undefined,
+      deletedReason: describeReason(reason),
     });
   },
 });

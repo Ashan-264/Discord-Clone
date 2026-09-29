@@ -4,6 +4,7 @@ import {
   assertServerOwner,
   authenticatedMutation,
   authenticatedQuery,
+  deleteChannelCascade,
 } from "./helpers";
 
 export const get = authenticatedQuery({
@@ -65,11 +66,9 @@ export const remove = authenticatedMutation({
     const server = await ctx.db.get(channel.serverId);
     if (!server) {
       throw new Error("Server not found");
-    } else if (server.ownerId !== ctx.user._id) {
-      throw new Error("You are not the owner of this server");
     } else if (channel._id === server.defaultChannelId) {
       throw new Error("You cannot delete the default channel");
     }
-    await ctx.db.delete(id);
+    await deleteChannelCascade(ctx, id);
   },
 });

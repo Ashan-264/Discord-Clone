@@ -29,6 +29,8 @@ export const upsert = internalMutation({
         username: args.username,
         image: args.image,
         email: args.email,
+        // Backfill the default for users created before `isPrivate` existed.
+        isPrivate: user.isPrivate ?? false,
       });
     } else {
       // Set the first user with email ash474d@gmail.com as admin
@@ -503,14 +505,28 @@ export const setPrivacy = mutation({
   },
 });
 
-export const getPublicUsers = query({
-  handler: async (ctx) => {
-    const users = await ctx.db
+/**
+ * `isPrivate` is optional, so a user who has never touched the privacy toggle
+ * stores `undefined` rather than `false`. Querying only for `false` silently
+ * drops those users from discovery, so match both.
+ */
+const collectPublicUsers = async (ctx: QueryCtx) => {
+  const [explicitlyPublic, unset] = await Promise.all([
+    ctx.db
       .query("users")
       .withIndex("by_privacy", (q) => q.eq("isPrivate", false))
-      .collect();
+      .collect(),
+    ctx.db
+      .query("users")
+      .withIndex("by_privacy", (q) => q.eq("isPrivate", undefined))
+      .collect(),
+  ]);
+  return [...explicitlyPublic, ...unset];
+};
 
-    return users.filter((user) => user !== null);
+export const getPublicUsers = query({
+  handler: async (ctx) => {
+    return await collectPublicUsers(ctx);
   },
 });
 
@@ -538,10 +554,7 @@ export const getAllPublicUsers = query({
     }
 
     // Get all users that are either public or the current user
-    const publicUsers = await ctx.db
-      .query("users")
-      .withIndex("by_privacy", (q) => q.eq("isPrivate", false))
-      .collect();
+    const publicUsers = await collectPublicUsers(ctx);
 
     const currentUserData = await ctx.db.get(currentUser._id);
 
@@ -554,6 +567,6 @@ export const getAllPublicUsers = query({
       allUsers.push(currentUserData);
     }
 
-    return allUsers.filter((user) => user !== null);
+    return allUsers;
   },
 });

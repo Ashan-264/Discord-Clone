@@ -1,3 +1,4 @@
+"use client";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { useQuery } from "convex/react";

@@ -48,7 +48,7 @@ export const create = authenticatedMutation({
       dmOrChannelId,
       sender: ctx.user._id,
     });
-    ctx.scheduler.runAfter(0, internal.functions.typing.remove, {
+    await ctx.scheduler.runAfter(0, internal.functions.typing.remove, {
       dmOrChannelId,
       user: ctx.user._id,
     });

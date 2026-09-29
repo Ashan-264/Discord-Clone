@@ -3,7 +3,7 @@ import {
   customMutation,
   customQuery,
 } from "convex-helpers/server/customFunctions";
-import { mutation, query, QueryCtx } from "../_generated/server";
+import { mutation, MutationCtx, query, QueryCtx } from "../_generated/server";
 import { getCurrentUser } from "./user";
 import { Doc, Id } from "../_generated/dataModel";
 
@@ -60,6 +60,36 @@ export const assertServerMember = async (
   if (!serverMember) {
     throw new Error("You are not a member of this server");
   }
+};
+
+/**
+ * Deletes a channel along with everything that references it. Callers are
+ * responsible for the permission check.
+ */
+export const deleteChannelCascade = async (
+  ctx: MutationCtx,
+  channelId: Id<"channels">
+) => {
+  const messages = await ctx.db
+    .query("messages")
+    .withIndex("by_dmOrChannelId", (q) => q.eq("dmOrChannelId", channelId))
+    .collect();
+  for (const message of messages) {
+    if (message.attatchment) {
+      await ctx.storage.delete(message.attatchment);
+    }
+    await ctx.db.delete(message._id);
+  }
+
+  const typingIndicators = await ctx.db
+    .query("typingIndicators")
+    .withIndex("by_dmOrChannelId", (q) => q.eq("dmOrChannelId", channelId))
+    .collect();
+  for (const indicator of typingIndicators) {
+    await ctx.db.delete(indicator._id);
+  }
+
+  await ctx.db.delete(channelId);
 };
 
 export const assertChannelMember = async (

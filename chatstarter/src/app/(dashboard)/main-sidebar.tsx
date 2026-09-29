@@ -1,3 +1,4 @@
+"use client";
 import {
   Sidebar,
   SidebarContent,
@@ -58,6 +59,8 @@ export function MainSidebar() {
               {servers?.map((server) => (
                 <SidebarMenuItem key={server._id}>
                   <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith(`/servers/${server._id}`)}
                     className="group-data-[collapsible=icon]:!p-0"
                     tooltip={server.name}
                   >

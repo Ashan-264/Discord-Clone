@@ -1,13 +1,15 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@radix-ui/react-dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectTrigger,

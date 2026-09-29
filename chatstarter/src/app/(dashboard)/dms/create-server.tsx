@@ -33,7 +33,10 @@ export function CreateServer() {
         name,
         iconId: imageUpload.storageId,
       });
-      router.push(`/channels/${serverId}/${defaultChannelId}`);
+      setOpen(false);
+      setName("");
+      imageUpload.reset();
+      router.push(`/servers/${serverId}/channels/${defaultChannelId}`);
     } catch (error) {
       toast.error("Error creating server. Please try again.", {
         description: error instanceof Error ? error.message : "Unknown error",

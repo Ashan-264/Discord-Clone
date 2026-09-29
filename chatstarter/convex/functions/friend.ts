@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { Id } from "../_generated/dataModel";
-import { QueryCtx } from "./../_generated/server.d";
+import { QueryCtx } from "../_generated/server";
 import { authenticatedMutation, authenticatedQuery } from "./helpers";
 
 export const listPending = authenticatedQuery({

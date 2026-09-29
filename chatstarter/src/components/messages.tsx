@@ -1,6 +1,7 @@
+"use client";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { ScrollArea } from "./ui/scroll-area";
 import { Id } from "../../convex/_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
@@ -100,7 +101,10 @@ function MessageItem({ message }: { message: Message }) {
 function MessageActions({ message }: { message: Message }) {
   const user = useQuery(api.functions.user.get);
   const removeMutation = useMutation(api.functions.message.remove);
+  // Only the author can delete a message; the server enforces this too, so
+  // showing the menu to anyone else just offers an action that always fails.
   if (!user || message.sender?._id !== user._id) {
+    return null;
   }
   return (
     <DropdownMenu>
@@ -133,8 +137,16 @@ function MessageInput({
 
   const ImageUpload = useImageUpload();
 
+  // Nothing to send yet, or the attachment is still uploading — submitting now
+  // would either post an empty message or silently drop the image, because
+  // storageId is only populated once the upload finishes.
+  const canSend =
+    !ImageUpload.isUploading &&
+    (content.trim().length > 0 || ImageUpload.storageId !== undefined);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!canSend) return;
     try {
       await sendMessage({
         dmOrChannelId: id,
@@ -189,7 +201,7 @@ function MessageInput({
             }}
           />
         </div>
-        <Button size="icon">
+        <Button size="icon" type="submit" disabled={!canSend}>
           <SendIcon />
           <span className="sr-only">Send</span>
         </Button>
